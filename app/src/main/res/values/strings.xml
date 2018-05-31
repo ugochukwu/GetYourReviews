@@ -1,6 +1,17 @@
 <resources>
     <string name="app_name">GetYourReviews</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search">Search</string>
+    <string-array name="sort_options">
+        <item>"DESC"</item>
+        <item>"ASC"</item>
+    </string-array>
+
+    <string-array name="result_size_options">
+        <item>5</item>
+        <item>10</item>
+        <item>50</item>
+        <item>ALL</item>
+    </string-array>
 </resources>

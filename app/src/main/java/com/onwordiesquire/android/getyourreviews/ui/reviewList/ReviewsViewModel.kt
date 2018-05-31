@@ -16,18 +16,18 @@ class ReviewsViewModel(private val dataRepository: DataRepository) : ViewModel()
     private var compositeDisposable: CompositeDisposable = CompositeDisposable()
         get() = if (field.isDisposed) CompositeDisposable() else field
     private var uiModelLiveData: MutableLiveData<UiModel> = MutableLiveData()
-
-    fun start() {
-        loadData()
-    }
+    private var selectedSortOption: SortDirection = SortDirection.DESC
+    private var resultSize: Int = DEFAULT_NO_OF_ITEMS
 
     fun subscribeToUiEvents() = uiModelLiveData
 
-    private fun loadData(noOfItems: Int = NO_OF_ITEMS, sortDirection: SortDirection = SortDirection.DESC) {
+    private fun loadData(noOfItems: Int = DEFAULT_NO_OF_ITEMS, sortDirection: SortDirection = SortDirection.DESC) {
         val disposable = dataRepository.fetchReviews(location = LOCATION, tour = TOUR, count = noOfItems, sortDirection = sortDirection)
                 .map({ mapToUiState(it) })
+                .toFlowable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .startWith(UiModel(state = ModelState.Loading()))
                 .subscribe(
                         { uiModelLiveData.value = it },
                         { uiModelLiveData.value = UiModel(state = ModelState.Error(ERROR_MSG)) }
@@ -47,9 +47,31 @@ class ReviewsViewModel(private val dataRepository: DataRepository) : ViewModel()
         super.onCleared()
         compositeDisposable.dispose()
     }
+
+    fun onSortOptionSelected(selectedOption: String?) {
+        selectedOption?.let {
+            selectedSortOption = SortDirection.valueOf(it)
+        }
+    }
+
+    fun onResultSizeOptionSelected(resultSizeOption: String?) {
+        resultSizeOption?.let {
+            if (it.isNotEmpty()) {
+                resultSize = when {
+                    it.equals(other = "all", ignoreCase = true) -> ALL_ITEMS
+                    else -> it.toInt()
+                }
+            }
+        }
+    }
+
+    fun onSearchClick() {
+        loadData(noOfItems = resultSize, sortDirection = selectedSortOption)
+    }
 }
 
+const val ALL_ITEMS = 0
 const val LOCATION = "berlin-l17"
 const val TOUR = "tempelhof-2-hour-airport-history-tour-berlin-airlift-more-t23776"
-const val NO_OF_ITEMS = 20
+const val DEFAULT_NO_OF_ITEMS = 20
 const val ERROR_MSG = "Sorry something's gone wrong"
