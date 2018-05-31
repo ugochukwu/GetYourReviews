@@ -12,7 +12,7 @@ interface DataRepository {
                      rating: Int = 0,
                      type: String = "",
                      sortBy: String = "",
-                     sortDirection: SortDirection = SortDirection.DESC): Single<DataSourceResponse<ReviewPageDto>>
+                     sortDirection: SortDirection = SortDirection.DESC): Single<DataSourceResponse>
 }
 
 enum class SortDirection(val value: String) {
@@ -20,7 +20,7 @@ enum class SortDirection(val value: String) {
     ASC("ASC")
 }
 
-sealed class DataSourceResponse<T> {
-    data class Success(val payload: ReviewPageDto?) : DataSourceResponse<ReviewPageDto>()
-    data class Failure(val code: Int) : DataSourceResponse<ReviewPageDto>()
+sealed class DataSourceResponse {
+    data class Success(val payload: ReviewPageDto?) : DataSourceResponse()
+    data class Failure(val code: Int) : DataSourceResponse()
 }
