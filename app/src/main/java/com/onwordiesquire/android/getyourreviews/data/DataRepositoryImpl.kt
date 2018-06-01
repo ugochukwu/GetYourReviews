@@ -7,7 +7,6 @@ import com.onwordiesquire.android.getyourreviews.data.response.ReviewDto
 import com.onwordiesquire.android.getyourreviews.data.response.ReviewPageDto
 import com.onwordiesquire.android.getyourreviews.ui.inputReview.ReviewSubmission
 import com.onwordiesquire.android.getyourreviews.utils.orDefault
-import io.reactivex.Flowable
 import io.reactivex.Single
 import retrofit2.Response
 
@@ -27,9 +26,15 @@ class DataRepositoryImpl(private val remoteDataSource: ReviewsApi,
         }
     }
 
+    /**
+     * The aim here is to combine the local datasource(database) stream and the remote data source stream,
+     * emitting results from both.
+     * To support offline operation each call to the remote datasource results in the data being persisted
+     * to the database.
+     */
     override fun fetchReviews(location: String, tour: String, pageNo: Int, count: Int, rating: Int,
-                              type: String, sortBy: String, sortDirection: SortDirection): Flowable<DataSourceResponse> {
-        val remoteStream = remoteDataSource.getReviews(
+                              type: String, sortBy: String, sortDirection: SortDirection): Single<DataSourceResponse> {
+        return remoteDataSource.getReviews(
                 location = location,
                 tour = tour,
                 pageNo = pageNo,
@@ -39,24 +44,24 @@ class DataRepositoryImpl(private val remoteDataSource: ReviewsApi,
                 sortBy = sortBy,
                 direction = sortDirection.value)
                 .doOnSuccess(persistResponseInDatabase())
-                .map { response ->
-                    with(response) {
-                        when {
-                            isSuccessful -> DataSourceResponse.Success(payload = body())
-                            else -> DataSourceResponse.Failure(code())
-                        }
-                    }
-                }
+                .flatMap { emitResultsFromDatabase() }
+                .onErrorResumeNext { emitResultsFromDatabase() }
+    }
 
-        val localStream = localDataSource.reviewDao().getAll().map {
+    private fun emitResultsFromDatabase(): Single<DataSourceResponse>? {
+        return localDataSource.reviewDao().getAll().map {
             it.map {
                 ReviewDto(it.review_id, it.rating,
                         it.title, it.message,
                         it.author, it.date)
-            }.run { DataSourceResponse.Success(payload = ReviewPageDto(data = this)) }
+            }.run {
+                if (this.isNotEmpty()) {
+                    DataSourceResponse.Success(payload = ReviewPageDto(data = this))
+                } else {
+                    DataSourceResponse.Failure()
+                }
+            }
         }
-
-        return Single.merge(localStream, remoteStream)
     }
 
     private fun persistResponseInDatabase(): (Response<ReviewPageDto>) -> Unit {
@@ -64,20 +69,31 @@ class DataRepositoryImpl(private val remoteDataSource: ReviewsApi,
             with(response.body()) {
                 this?.data?.let {
                     it.map {
-                        Review(rating = it.rating.orDefault(),
-                                title = it.title.orDefault(),
-                                message = it.message.orDefault(),
-                                date = it.date.orDefault(),
-                                author = it.author.orDefault())
+                        mapApiResponseToDbEntity(it)
                     }.filter {
                         it.isNotDefault()
                     }.run {
-                        localDataSource.reviewDao().deleteAll()
-                        localDataSource.reviewDao().insertAll(*this.toTypedArray())
+                        clearDbAndStoreNewResults(this)
                     }
                 }
             }
         }
+    }
+
+    private fun clearDbAndStoreNewResults(list: List<Review>) {
+        if (list.isNotEmpty()) {
+            localDataSource.reviewDao().deleteAll()
+            localDataSource.reviewDao().insertAll(*list.toTypedArray())
+        }
+    }
+
+    private fun mapApiResponseToDbEntity(it: ReviewDto): Review {
+        return Review(rating = it.rating.orDefault(),
+                title = it.title.orDefault(),
+                message = it.message.orDefault(),
+                date = it.date.orDefault(),
+                author = it.author.orDefault(),
+                review_id = it.review_id.orDefault(0))
     }
 }
 

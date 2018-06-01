@@ -12,6 +12,6 @@ class GetYourReviewsApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin(this, listOf(networkModule, repositoryModule, viewModelModule))
-        Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this)
     }
 }

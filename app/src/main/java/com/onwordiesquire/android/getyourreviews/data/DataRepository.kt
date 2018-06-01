@@ -2,7 +2,7 @@ package com.onwordiesquire.android.getyourreviews.data
 
 import com.onwordiesquire.android.getyourreviews.data.response.ReviewPageDto
 import com.onwordiesquire.android.getyourreviews.ui.inputReview.ReviewSubmission
-import io.reactivex.Flowable
+import io.reactivex.Single
 
 interface DataRepository {
 
@@ -13,7 +13,7 @@ interface DataRepository {
                      rating: Int = 0,
                      type: String = "",
                      sortBy: String = "",
-                     sortDirection: SortDirection = SortDirection.DESC): Flowable<DataSourceResponse>
+                     sortDirection: SortDirection = SortDirection.DESC): Single<DataSourceResponse>
 
     fun createReview(reviewSubmission: ReviewSubmission)
 }
@@ -25,5 +25,5 @@ enum class SortDirection(val value: String) {
 
 sealed class DataSourceResponse {
     data class Success(val payload: ReviewPageDto?) : DataSourceResponse()
-    data class Failure(val code: Int) : DataSourceResponse()
+    class Failure : DataSourceResponse()
 }

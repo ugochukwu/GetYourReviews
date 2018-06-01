@@ -63,8 +63,8 @@ class ReviewListFragment : Fragment() {
     }
 
     private fun renderSuccessState(data: ReviewPageDto) {
-        progressBar.hide()
         reviewsAdapter.submitList(data.data)
+        progressBar.hide()
         reviewsRecyclerView.show()
     }
 

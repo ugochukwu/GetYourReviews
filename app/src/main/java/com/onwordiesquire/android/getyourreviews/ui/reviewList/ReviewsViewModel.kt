@@ -26,6 +26,7 @@ class ReviewsViewModel(private val dataRepository: DataRepository) : ViewModel()
                 .map({ mapToUiState(it) })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .toFlowable()
                 .startWith(UiModel(state = ModelState.Loading()))
                 .subscribe(
                         { uiModelLiveData.value = it },
