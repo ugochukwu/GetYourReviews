@@ -1,42 +1,56 @@
 package com.onwordiesquire.android.getyourreviews.ui.inputReview
 
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.design.widget.TextInputLayout
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import com.onwordiesquire.android.getyourreviews.OnNavigationEventListener
 import com.onwordiesquire.android.getyourreviews.R
+import kotlinx.android.synthetic.main.fragment_input.*
+import org.koin.android.architecture.ext.viewModel
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [InputFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
 class InputFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    companion object {
+        @JvmStatic
+        fun newInstance() = InputFragment()
     }
+
+    private val viewModel by viewModel<InputViewModel>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_input, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupSubmitButton()
+        setupEventObservation()
+    }
 
-    companion object {
+    private fun setupEventObservation() {
+        viewModel.navigationEventLiveData.observe(this, Observer {
+            (activity as OnNavigationEventListener).pop()
+        })
+    }
 
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-                InputFragment()
+    private fun setupSubmitButton() {
+        searchBtn.setOnClickListener {
+            viewModel.onSubmitData(
+                    ReviewSubmission(
+                            title = titleInput.textValue,
+                            message = messageInput.textValue,
+                            reviewerName = authorInput.textValue)
+            )
+        }
     }
 }
+
+private fun CharSequence.toDouble(): Double? = this.toString().toDoubleOrNull()
+private val TextInputLayout.textValue
+    get() = editText?.text.toString()

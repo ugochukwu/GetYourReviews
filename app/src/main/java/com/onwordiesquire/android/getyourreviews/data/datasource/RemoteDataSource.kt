@@ -3,8 +3,10 @@ package com.onwordiesquire.android.getyourreviews.data.datasource
 import com.onwordiesquire.android.getyourreviews.data.response.ReviewPageDto
 import io.reactivex.Single
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -19,6 +21,11 @@ interface ReviewsApi {
                    @Query("sortBy") sortBy: String?,
                    @Query("direction") direction: String?,
                    @Header("User-Agent") header: String = "Get Your Guide"): Single<Response<ReviewPageDto>>
+
+    @POST("{location}/{tour}")
+    fun createReview(@Path("location") location: String,
+                     @Path("tour") tour: String,
+                     @Body review: Review)
 }
 
 const val BASE_URL = "https://www.getyourguide.com/"

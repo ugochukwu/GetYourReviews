@@ -6,10 +6,14 @@ import android.support.v7.app.AppCompatActivity
 
 fun AppCompatActivity.replaceFragment(fragment: Fragment,
                                       @IdRes containerId: Int,
-                                      tag: String = fragment.javaClass.simpleName) {
+                                      tag: String = fragment.javaClass.simpleName,
+                                      addToBackStack: Boolean = false) {
     val transaction = supportFragmentManager.beginTransaction()
     transaction.apply {
         replace(containerId, fragment, tag)
+        if (addToBackStack) {
+            addToBackStack(tag)
+        }
         commit()
     }
 }

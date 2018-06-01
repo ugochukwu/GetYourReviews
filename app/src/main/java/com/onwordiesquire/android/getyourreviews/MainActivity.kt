@@ -2,17 +2,11 @@ package com.onwordiesquire.android.getyourreviews
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import com.onwordiesquire.android.getyourreviews.data.DataRepository
-import com.onwordiesquire.android.getyourreviews.data.DataSourceResponse
+import com.onwordiesquire.android.getyourreviews.ui.inputReview.InputFragment
 import com.onwordiesquire.android.getyourreviews.ui.reviewList.ReviewListFragment
-import com.onwordiesquire.android.getyourreviews.utils.MyLogger
 import com.onwordiesquire.android.getyourreviews.utils.replaceFragment
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import org.koin.android.ext.android.inject
 
-class MainActivity : AppCompatActivity(), MyLogger {
-    private val dataRepository: DataRepository by inject()
+class MainActivity : AppCompatActivity(), OnNavigationEventListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,4 +15,19 @@ class MainActivity : AppCompatActivity(), MyLogger {
         replaceFragment(ReviewListFragment.newInstance(), R.id.fragmentContainer)
     }
 
+    override fun navigateToEntryForm() {
+        replaceFragment(
+                fragment = InputFragment.newInstance(),
+                containerId = R.id.fragmentContainer,
+                addToBackStack = true)
+    }
+
+    override fun pop() {
+        supportFragmentManager.popBackStack()
+    }
+}
+
+interface OnNavigationEventListener {
+    fun navigateToEntryForm()
+    fun pop()
 }

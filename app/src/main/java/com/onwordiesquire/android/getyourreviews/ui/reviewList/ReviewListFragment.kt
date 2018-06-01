@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
+import com.onwordiesquire.android.getyourreviews.OnNavigationEventListener
 import com.onwordiesquire.android.getyourreviews.R
 import com.onwordiesquire.android.getyourreviews.data.response.ReviewPageDto
 import com.onwordiesquire.android.getyourreviews.ui.ModelState
@@ -35,7 +36,12 @@ class ReviewListFragment : Fragment() {
         setupSelectionOptions()
         setupResultSizeOptions()
         setupSearchButton()
+        setupAddReviewsButton()
         observeUiEvents()
+    }
+
+    private fun setupAddReviewsButton() {
+        addReviewBtn.setOnClickListener { viewModel.onAddReviewsClick() }
     }
 
     private fun setupSearchButton() {
@@ -54,6 +60,10 @@ class ReviewListFragment : Fragment() {
                     }
                 }
             }
+        })
+
+        viewModel.navigationEvents.observe(this, Observer {
+            (activity as OnNavigationEventListener).navigateToEntryForm()
         })
     }
 

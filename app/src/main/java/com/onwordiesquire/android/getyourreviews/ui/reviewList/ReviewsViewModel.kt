@@ -1,23 +1,22 @@
 package com.onwordiesquire.android.getyourreviews.ui.reviewList
 
 import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import com.onwordiesquire.android.getyourreviews.data.DataRepository
 import com.onwordiesquire.android.getyourreviews.data.DataSourceResponse
 import com.onwordiesquire.android.getyourreviews.data.SortDirection
 import com.onwordiesquire.android.getyourreviews.ui.ModelState
 import com.onwordiesquire.android.getyourreviews.ui.UiModel
+import com.onwordiesquire.android.getyourreviews.ui.base.BaseViewModel
+import com.onwordiesquire.android.getyourreviews.utils.SingleLiveEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-class ReviewsViewModel(private val dataRepository: DataRepository) : ViewModel() {
+class ReviewsViewModel(private val dataRepository: DataRepository) : BaseViewModel() {
 
-    private var compositeDisposable: CompositeDisposable = CompositeDisposable()
-        get() = if (field.isDisposed) CompositeDisposable() else field
     private var uiModelLiveData: MutableLiveData<UiModel> = MutableLiveData()
     private var selectedSortOption: SortDirection = SortDirection.DESC
     private var resultSize: Int = DEFAULT_NO_OF_ITEMS
+    var navigationEvents: SingleLiveEvent<Unit> = SingleLiveEvent()
 
     fun subscribeToUiEvents() = uiModelLiveData
 
@@ -43,11 +42,6 @@ class ReviewsViewModel(private val dataRepository: DataRepository) : ViewModel()
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.dispose()
-    }
-
     fun onSortOptionSelected(selectedOption: String?) {
         selectedOption?.let {
             selectedSortOption = SortDirection.valueOf(it)
@@ -67,6 +61,10 @@ class ReviewsViewModel(private val dataRepository: DataRepository) : ViewModel()
 
     fun onSearchClick() {
         loadData(noOfItems = resultSize, sortDirection = selectedSortOption)
+    }
+
+    fun onAddReviewsClick() {
+        navigationEvents.call()
     }
 }
 

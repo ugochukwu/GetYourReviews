@@ -7,6 +7,7 @@ import com.onwordiesquire.android.getyourreviews.data.response.ReviewDto
 import com.onwordiesquire.android.getyourreviews.data.response.ReviewPageDto
 import com.onwordiesquire.android.getyourreviews.ui.inputReview.ReviewSubmission
 import com.onwordiesquire.android.getyourreviews.utils.orDefault
+import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.Response
 
@@ -14,17 +15,18 @@ import retrofit2.Response
 class DataRepositoryImpl(private val remoteDataSource: ReviewsApi,
                          private val localDataSource: AppDatabase) : DataRepository {
 
-    override fun createReview(reviewSubmission: ReviewSubmission) {
-        return reviewSubmission.run {
-            localDataSource.reviewDao().insertAll(Review(
-                    title = title,
-                    message = message,
-                    author = reviewerName,
-                    date = date,
-                    rating = rating.toDouble()
-            ))
-        }
-    }
+    override fun createReview(reviewSubmission: ReviewSubmission) =
+            Completable.fromAction {
+                reviewSubmission.apply {
+                    localDataSource.reviewDao().insertAll(Review(
+                            title = title,
+                            message = message,
+                            author = reviewerName,
+                            date = date,
+                            rating = rating
+                    ))
+                }
+            }
 
     /**
      * The aim here is to combine the local datasource(database) stream and the remote data source stream,

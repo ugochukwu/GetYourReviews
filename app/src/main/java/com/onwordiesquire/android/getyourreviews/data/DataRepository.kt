@@ -2,6 +2,7 @@ package com.onwordiesquire.android.getyourreviews.data
 
 import com.onwordiesquire.android.getyourreviews.data.response.ReviewPageDto
 import com.onwordiesquire.android.getyourreviews.ui.inputReview.ReviewSubmission
+import io.reactivex.Completable
 import io.reactivex.Single
 
 interface DataRepository {
@@ -15,7 +16,7 @@ interface DataRepository {
                      sortBy: String = "",
                      sortDirection: SortDirection = SortDirection.DESC): Single<DataSourceResponse>
 
-    fun createReview(reviewSubmission: ReviewSubmission)
+    fun createReview(reviewSubmission: ReviewSubmission): Completable
 }
 
 enum class SortDirection(val value: String) {
