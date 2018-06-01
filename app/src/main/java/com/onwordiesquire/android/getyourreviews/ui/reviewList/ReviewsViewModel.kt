@@ -24,7 +24,6 @@ class ReviewsViewModel(private val dataRepository: DataRepository) : ViewModel()
     private fun loadData(noOfItems: Int = DEFAULT_NO_OF_ITEMS, sortDirection: SortDirection = SortDirection.DESC) {
         val disposable = dataRepository.fetchReviews(location = LOCATION, tour = TOUR, count = noOfItems, sortDirection = sortDirection)
                 .map({ mapToUiState(it) })
-                .toFlowable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .startWith(UiModel(state = ModelState.Loading()))

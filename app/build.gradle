@@ -47,4 +47,9 @@ dependencies {
     implementation libs.koin
 
     implementation libs.architectureComponents
+    implementation libs.room
+    implementation libs.room_rxjava
+
+    implementation libs.stetho
+    kapt libs.room_compiler
 }

@@ -26,7 +26,7 @@ class ReviewListAdapter : ListAdapter<ReviewDto, ReviewListAdapter.ReviewItemVie
                 txtDetails.showContent(item.message)
                 txtDate.showContent(item.date)
                 txtAuthor.showContent(item.author)
-                txtRating.showContent(item.rating)
+                txtRating.showContent(item.rating.toString())
             }
         }
     }

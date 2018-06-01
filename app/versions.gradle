@@ -15,7 +15,9 @@ ext {
         truth                 : "0.36",
         kotlin_reflect        : "1.2.41",
         glideVersion          : "4.7.1",
-        koinVersion           : "0.9.3"
+        koinVersion           : "0.9.3",
+        room_version          : "1.1.0",
+        stetho_version        : "1.5.0"
     ]
     libs = [
         support_annotations        : "com.android.support:support-annotations:${versions.supportLib}",
@@ -46,5 +48,9 @@ ext {
         glide_compiler             : "com.github.bumptech.glide:compiler:${versions.glideVersion}",
         cards                      : "com.android.support:cardview-v7:${versions.supportLib}",
         koin                       : "org.koin:koin-android-architecture:${versions.koinVersion}",
+        room                       : "android.arch.persistence.room:runtime:${versions.room_version}",
+        room_compiler              : "android.arch.persistence.room:compiler:${versions.room_version}",
+        room_rxjava                : "android.arch.persistence.room:rxjava2:${versions.room_version}",
+        stetho                     : "com.facebook.stetho:stetho:${versions.stetho_version}"
     ]
 }

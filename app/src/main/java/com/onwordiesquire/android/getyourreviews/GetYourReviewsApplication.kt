@@ -1,6 +1,7 @@
 package com.onwordiesquire.android.getyourreviews
 
 import android.app.Application
+import com.facebook.stetho.Stetho
 import com.onwordiesquire.android.getyourreviews.di.networkModule
 import com.onwordiesquire.android.getyourreviews.di.repositoryModule
 import com.onwordiesquire.android.getyourreviews.di.viewModelModule
@@ -11,5 +12,6 @@ class GetYourReviewsApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin(this, listOf(networkModule, repositoryModule, viewModelModule))
+        Stetho.initializeWithDefaults(this);
     }
 }
