@@ -9,6 +9,7 @@
     <string name="submit">Submit</string>
     <string name="author">Author</string>
     <string name="name_hint">Your name please</string>
+    <string name="result_size">Result Size</string>
     <string-array name="sort_options">
         <item>"DESC"</item>
         <item>"ASC"</item>
